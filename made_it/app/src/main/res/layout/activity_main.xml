@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainactivity"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -13,12 +14,13 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="15dp"
         >
 
         <ImageButton
             android:id="@+id/prevButton"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:scaleType="fitXY"
             android:background="@android:color/transparent"
             android:src="@drawable/prev"
@@ -29,16 +31,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:gravity="center"
-            android:padding="16dp"
+            android:padding="3dp"
             android:textColor="@color/black"
-            android:fontFamily="sans-serif-black"/>
+            android:fontFamily="@font/pretendard"
+            android:textStyle="bold"/>
 
         <ImageButton
             android:id="@+id/nextButton"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:scaleType="fitXY"
             android:background="@android:color/transparent"
             android:src="@drawable/next"
@@ -53,7 +56,50 @@
         app:cv_dayViewResource="@layout/calendar_day_layout"
         app:cv_monthHeaderResource="@layout/calendar_day_titles_container"
         app:layout_constraintTop_toBottomOf="@id/linearMain"
+        android:layout_marginTop="20dp"
         />
 
+    <LinearLayout
+        android:id="@+id/bottomMenuLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:background="@color/white"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        >
+        <ImageButton
+            android:id="@+id/item1Button"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_item1_on"
+            android:background="?attr/selectableItemBackground"
+            android:scaleType="centerInside"
+            android:contentDescription="home"
+            android:layout_weight="1"/>
+
+        <ImageButton
+            android:id="@+id/item2Button"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_item2_off"
+            android:background="?attr/selectableItemBackground"
+            android:scaleType="centerInside"
+            android:contentDescription="add"
+            android:layout_weight="1"/>
+
+        <ImageButton
+            android:id="@+id/item3Button"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_item3_off"
+            android:background="?attr/selectableItemBackground"
+            android:scaleType="centerInside"
+            android:contentDescription="all"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
