@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -203,6 +204,13 @@ class MainActivity : AppCompatActivity() {
             fetchHolidays(selectedMonth.year, selectedMonth.monthValue)
         }
 
+//        val inflater = LayoutInflater.from(this)
+//        val resizableContainer = findViewById<ResizableView>(R.id.resizableView)
+//        // Inflate the XML layout file
+//        val view = inflater.inflate(R.layout.todo_resizable, resizableContainer, false)
+//
+//        // Add the inflated view to the ResizableContainer
+//        resizableContainer.addView(view)
 
     }
     fun dpToPx(dp: Int): Float {

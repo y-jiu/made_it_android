@@ -59,6 +59,18 @@
         android:layout_marginTop="20dp"
         />
 
+    <edu.skku.cs.made_it.ResizableView
+        android:id="@+id/resizableView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="@color/black"
+        app:layout_constraintBottom_toTopOf="@id/bottomMenuLayout"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        >
+
+        <include layout="@layout/todo_resizable" />
+    </edu.skku.cs.made_it.ResizableView>
+
     <LinearLayout
         android:id="@+id/bottomMenuLayout"
         android:layout_width="match_parent"
