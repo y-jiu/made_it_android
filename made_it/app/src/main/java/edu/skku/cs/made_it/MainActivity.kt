@@ -87,10 +87,6 @@ class MainActivity : AppCompatActivity() {
                 val today = LocalDate.now()
                 container.textView.text = data.date.dayOfMonth.toString()
                 Log.d("pos", data.position.toString())
-                val layoutParams = container.dayCell.layoutParams
-                layoutParams.width = calendarView.width / 7
-                layoutParams.height = layoutParams.width
-                container.dayCell.layoutParams = layoutParams
                 if (data.position == DayPosition.MonthDate) {
                     container.textView.setTextColor(Color.BLACK)
 
@@ -122,7 +118,7 @@ class MainActivity : AppCompatActivity() {
                     container.textView.apply {
                         setBackgroundColor(Color.BLACK)
                         setTextColor(Color.WHITE)
-                        val cornerRadius = dpToPx(25)
+                        val cornerRadius = dpToPx(28)
                         val backgroundDrawable = GradientDrawable()
                         backgroundDrawable.cornerRadius = cornerRadius
                         backgroundDrawable.setColor(Color.BLACK)
@@ -227,7 +223,7 @@ class MainActivity : AppCompatActivity() {
         listView.adapter = adapter
         listView.setDivider(null)
 
-        val addBtn = findViewById<Button>(R.id.addButton)
+        val addBtn = findViewById<ImageButton>(R.id.addButton)
         addBtn.setOnClickListener {
             val intent = Intent(this, AddActivity::class.java)
             startActivity(intent)
