@@ -10,8 +10,10 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
+import androidx.core.view.updateLayoutParams
 import com.google.gson.Gson
 import com.kizitonwose.calendar.core.*
+import com.kizitonwose.calendar.view.DaySize
 import com.kizitonwose.calendar.view.MonthDayBinder
 import com.kizitonwose.calendar.view.MonthHeaderFooterBinder
 import com.kizitonwose.calendar.view.MonthScrollListener
@@ -45,6 +47,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var selectedMonth: YearMonth
     private lateinit var selectedMonthHoliday: MutableList<Item>
     private var selectedMonthHolidayDates = mutableListOf<String>()
+    var totaldays = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,6 +71,9 @@ class MainActivity : AppCompatActivity() {
 
         calendarMonth.text = selectedMonth.year.toString() + "년 " + selectedMonth.monthValue.toString() + "월"
 
+
+
+
         fetchHolidays(selectedMonth.year, selectedMonth.monthValue)
         val daysOfWeek = daysOfWeek()
 
@@ -79,7 +85,11 @@ class MainActivity : AppCompatActivity() {
             override fun bind(container: DayViewContainer, data: CalendarDay) {
                 val today = LocalDate.now()
                 container.textView.text = data.date.dayOfMonth.toString()
-
+                Log.d("pos", data.position.toString())
+                val layoutParams = container.dayCell.layoutParams
+                layoutParams.width = calendarView.width / 7
+                layoutParams.height = layoutParams.width
+                container.dayCell.layoutParams = layoutParams
                 if (data.position == DayPosition.MonthDate) {
                     container.textView.setTextColor(Color.BLACK)
 
@@ -117,8 +127,8 @@ class MainActivity : AppCompatActivity() {
                         backgroundDrawable.setColor(Color.BLACK)
                         background = backgroundDrawable
                     }
+                    totaldays++
                 }
-
 
                 container.view.setOnClickListener {
                     Log.d("day", data.toString())
@@ -204,14 +214,17 @@ class MainActivity : AppCompatActivity() {
             fetchHolidays(selectedMonth.year, selectedMonth.monthValue)
         }
 
-//        val inflater = LayoutInflater.from(this)
-//        val resizableContainer = findViewById<ResizableView>(R.id.resizableView)
-//        // Inflate the XML layout file
-//        val view = inflater.inflate(R.layout.todo_resizable, resizableContainer, false)
+        val listView = findViewById<ListView>(R.id.todoDayList)
 //
-//        // Add the inflated view to the ResizableContainer
-//        resizableContainer.addView(view)
+//        // Create a list of items
+        val items = listOf("Item 1", "Item 2", "Item 3")
 
+        // Create the custom adapter
+        val adapter = TodoDayListAdapter(this, items)
+
+        // Set the adapter for the ListView
+        listView.adapter = adapter
+        listView.setDivider(null)
     }
     fun dpToPx(dp: Int): Float {
         val scale = resources.displayMetrics.density
