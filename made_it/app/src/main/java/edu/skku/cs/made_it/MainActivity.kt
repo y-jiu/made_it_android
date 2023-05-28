@@ -1,5 +1,6 @@
 package edu.skku.cs.made_it
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
@@ -225,6 +226,12 @@ class MainActivity : AppCompatActivity() {
         // Set the adapter for the ListView
         listView.adapter = adapter
         listView.setDivider(null)
+
+        val addBtn = findViewById<Button>(R.id.addButton)
+        addBtn.setOnClickListener {
+            val intent = Intent(this, AddActivity::class.java)
+            startActivity(intent)
+        }
     }
     fun dpToPx(dp: Int): Float {
         val scale = resources.displayMetrics.density
