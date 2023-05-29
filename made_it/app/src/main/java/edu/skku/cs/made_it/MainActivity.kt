@@ -228,6 +228,13 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, AddActivity::class.java)
             startActivity(intent)
         }
+
+
+        val allBtn = findViewById<ImageButton>(R.id.allButton)
+        allBtn.setOnClickListener {
+            val intent = Intent(this, AllActivity::class.java)
+            startActivity(intent)
+        }
     }
     fun dpToPx(dp: Int): Float {
         val scale = resources.displayMetrics.density
