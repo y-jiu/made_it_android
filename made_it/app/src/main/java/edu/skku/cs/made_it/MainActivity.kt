@@ -66,14 +66,32 @@ class MainActivity : AppCompatActivity() {
         calendarView.setup(startMonth, endMonth, firstDayOfWeek)
         calendarView.scrollToMonth(currentMonth)
 
+//        val dbHelper = TodoDbHelper(this)
+
+//        val newTodo = Todo(1, "Meeting", "Team meeting at 3 PM", "2023-05-02", 0)
+//        dbHelper.createTodo(newTodo)
+
+//        val retrievedTodo = dbHelper.getTodoById(1)
+//        println(retrievedTodo)
+
+//        // Update a schedule
+//        val updatedTodo = retrievedTodo?.copy(title = "Updated Meeting")
+//        if (updatedTodo != null) {
+//            dbHelper.updateTodo(updatedTodo)
+//            val retrievedUpdatedSchedule = dbHelper.getTodoById(1)
+//            println(retrievedUpdatedSchedule)
+//        }
+//
+//        // Delete a schedule
+//        dbHelper.deleteTodo("1")
+//        val deletedTodo = dbHelper.getTodoById(1)
+//        println(deletedTodo)
+
         calendarMonth = findViewById(R.id.month)
 
         selectedMonth = currentMonth
 
         calendarMonth.text = selectedMonth.year.toString() + "년 " + selectedMonth.monthValue.toString() + "월"
-
-
-
 
         fetchHolidays(selectedMonth.year, selectedMonth.monthValue)
         val daysOfWeek = daysOfWeek()
