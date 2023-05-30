@@ -129,7 +129,7 @@ class TodoDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
 
     fun getAllToDoItems(): List<Todo> {
         val db = readableDatabase
-        val cursor: Cursor = db.rawQuery("SELECT * FROM todo ORDER BY $COLUMN_DATE ASC", null)
+        val cursor: Cursor = db.rawQuery("SELECT * FROM todo WHERE $COLUMN_CHECKED = 0 ORDER BY $COLUMN_DATE ASC", null)
 
         val todoItems = mutableListOf<Todo>()
 
@@ -151,5 +151,22 @@ class TodoDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
         return todoItems
     }
 
+    fun getAllToDoDates(): List<String> {
+        val db = readableDatabase
+        val cursor: Cursor = db.rawQuery("SELECT $COLUMN_DATE FROM todo", null)
 
+        val dates = mutableListOf<String>()
+
+        if (cursor.moveToFirst()) {
+            do {
+                val date = cursor.getString(cursor.getColumnIndex(COLUMN_DATE))
+                dates.add(date)
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        return dates
+    }
 }

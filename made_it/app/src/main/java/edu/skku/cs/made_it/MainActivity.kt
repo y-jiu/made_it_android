@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var selectedMonth: YearMonth
     private lateinit var selectedMonthHoliday: MutableList<Item>
     private var selectedMonthHolidayDates = mutableListOf<String>()
+    private var todoDates = listOf<String>()
     var totaldays = 0
     private lateinit var selectedDate: LocalDate
 
@@ -86,6 +87,8 @@ class MainActivity : AppCompatActivity() {
 
         listView.adapter = adapter
         listView.setDivider(null)
+
+        todoDates = dbHelper.getAllToDoDates()
 
         // Get the day of the week as an integer (Sunday = 1, Monday = 2, etc.)
         val selectedDayOfWeek = selectedDate.dayOfWeek
@@ -132,6 +135,10 @@ class MainActivity : AppCompatActivity() {
                     if (data.position == DayPosition.MonthDate) {
                         container.textView.setTextColor(Color.BLACK)
 
+                        if (todoDates.contains(data.date.toString())){
+                            container.textView.setTextColor(Color.parseColor("#DB8DFF"))
+                        }
+
                         if (data.date.dayOfWeek == DayOfWeek.SUNDAY) {
                             container.textView.setTextColor(Color.parseColor("#FF747D"))
                         }
@@ -145,6 +152,10 @@ class MainActivity : AppCompatActivity() {
                         }
                     } else {
                         container.textView.setTextColor(Color.parseColor("#A5A5A5"))
+
+                        if (todoDates.contains(data.date.toString())){
+                            container.textView.setTextColor(Color.parseColor("#DE96FF"))
+                        }
 
                         if (data.date.dayOfWeek == DayOfWeek.SUNDAY){
                             container.textView.setTextColor(Color.parseColor("#F5B4B8"))
@@ -262,8 +273,6 @@ class MainActivity : AppCompatActivity() {
             fetchHolidays(selectedMonth.year, selectedMonth.monthValue)
         }
 
-//        val listView = findViewById<ListView>(R.id.todoDayList)
-
         val addBtn = findViewById<ImageButton>(R.id.addButton)
         addBtn.setOnClickListener {
             val intent = Intent(this, AddActivity::class.java)
@@ -353,5 +362,18 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        val dbHelper = TodoDbHelper(this)
+
+        val todoItems = dbHelper.getToDoItemsByDay(selectedDate.toString())
+        val adapter = TodoDayListAdapter(this, todoItems)
+
+        val listView = findViewById<ListView>(R.id.todoDayList)
+
+        listView.adapter = adapter
+        listView.setDivider(null)
+    }
 
 }
