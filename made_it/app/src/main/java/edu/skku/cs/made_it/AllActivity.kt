@@ -3,6 +3,8 @@ package edu.skku.cs.made_it
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ListView
+import java.text.SimpleDateFormat
+import java.util.*
 
 class AllActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -10,12 +12,15 @@ class AllActivity : AppCompatActivity() {
         setContentView(R.layout.activity_all)
 
         val listView = findViewById<ListView>(R.id.todoAllList)
-//
-//        // Create a list of items
-        val items = listOf("Item 1", "Item 2", "Item 3")
+
+        val dbHelper = TodoDbHelper(this)
+
+        val todoItems = dbHelper.getAllToDoItems()
+
+        println(todoItems)
 
         // Create the custom adapter
-        val adapter = TodoAllListAdapter(this, items)
+        val adapter = TodoAllListAdapter(this, todoItems)
 
         // Set the adapter for the ListView
         listView.adapter = adapter

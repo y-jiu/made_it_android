@@ -49,6 +49,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var selectedMonthHoliday: MutableList<Item>
     private var selectedMonthHolidayDates = mutableListOf<String>()
     var totaldays = 0
+    private lateinit var selectedDate: LocalDate
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,10 +67,6 @@ class MainActivity : AppCompatActivity() {
         calendarView.setup(startMonth, endMonth, firstDayOfWeek)
         calendarView.scrollToMonth(currentMonth)
 
-//        val dbHelper = TodoDbHelper(this)
-
-//        val newTodo = Todo(1, "Meeting", "Team meeting at 3 PM", "2023-05-02", 0)
-//        dbHelper.createTodo(newTodo)
 
 //        val retrievedTodo = dbHelper.getTodoById(1)
 //        println(retrievedTodo)
@@ -93,8 +90,36 @@ class MainActivity : AppCompatActivity() {
 
         calendarMonth.text = selectedMonth.year.toString() + "년 " + selectedMonth.monthValue.toString() + "월"
 
+        selectedDate = LocalDate.now()
+
         fetchHolidays(selectedMonth.year, selectedMonth.monthValue)
         val daysOfWeek = daysOfWeek()
+        val dbHelper = TodoDbHelper(this)
+
+        val todoItems = dbHelper.getToDoItemsByDay(selectedDate.toString())
+        val adapter = TodoDayListAdapter(this, todoItems)
+
+        val listView = findViewById<ListView>(R.id.todoDayList)
+        // Set the adapter for the ListView
+        listView.adapter = adapter
+        listView.setDivider(null)
+
+        // Get the day of the week as an integer (Sunday = 1, Monday = 2, etc.)
+        val selectedDayOfWeek = selectedDate.dayOfWeek
+        // Map the day of the week integer to the corresponding day name
+        val dayOfWeekName = when (selectedDayOfWeek) {
+            DayOfWeek.SUNDAY-> "일요일"
+            DayOfWeek.MONDAY -> "월요일"
+            DayOfWeek.TUESDAY -> "화요일"
+            DayOfWeek.WEDNESDAY -> "수요일"
+            DayOfWeek.THURSDAY -> "목요일"
+            DayOfWeek.FRIDAY -> "금요일"
+            DayOfWeek.SATURDAY -> "토요일"
+            else -> "Unknown"
+        }
+        val todoDate = selectedDate.dayOfMonth.toString() + ". " + dayOfWeekName
+        val todoDateText = findViewById<TextView>(R.id.todoDayText)
+        todoDateText.text = todoDate
 
         calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
             // Called only when a new container is needed.
@@ -104,34 +129,51 @@ class MainActivity : AppCompatActivity() {
             override fun bind(container: DayViewContainer, data: CalendarDay) {
                 val today = LocalDate.now()
                 container.textView.text = data.date.dayOfMonth.toString()
-                Log.d("pos", data.position.toString())
-                if (data.position == DayPosition.MonthDate) {
-                    container.textView.setTextColor(Color.BLACK)
 
-                    if (data.date.dayOfWeek == DayOfWeek.SUNDAY){
-                        container.textView.setTextColor(Color.parseColor("#FF747D"))
-                    }
-                    if (data.date.dayOfWeek == DayOfWeek.SATURDAY){
-                        container.textView.setTextColor(Color.parseColor("#7887FF"))
-                    }
-
-                    if (selectedMonthHolidayDates.contains(data.date.toString())){
-                        container.textView.setTextColor(Color.parseColor("#FF747D"))
+                if (data.date == selectedDate) {
+                    container.textView.apply {
+                        setBackgroundColor(Color.parseColor("#8AE1FF"))
+                        setTextColor(Color.BLACK)
+                        val cornerRadius = dpToPx(28)
+                        val backgroundDrawable = GradientDrawable()
+                        backgroundDrawable.cornerRadius = cornerRadius
+                        backgroundDrawable.setColor(Color.parseColor("#8AE1FF"))
+                        background = backgroundDrawable
                     }
                 } else {
-                    container.textView.setTextColor(Color.parseColor("#A5A5A5"))
+                    container.textView.apply {
+                        setBackgroundColor(Color.TRANSPARENT)
+                        setTextColor(Color.BLACK)
+                    }
+                    if (data.position == DayPosition.MonthDate) {
+                        container.textView.setTextColor(Color.BLACK)
 
-                    if (data.date.dayOfWeek == DayOfWeek.SUNDAY){
-                        container.textView.setTextColor(Color.parseColor("#F5B4B8"))
+                        if (data.date.dayOfWeek == DayOfWeek.SUNDAY) {
+                            container.textView.setTextColor(Color.parseColor("#FF747D"))
+                        }
+
+                        if (data.date.dayOfWeek == DayOfWeek.SATURDAY) {
+                            container.textView.setTextColor(Color.parseColor("#7887FF"))
+                        }
+
+                        if (selectedMonthHolidayDates.contains(data.date.toString())) {
+                            container.textView.setTextColor(Color.parseColor("#FF747D"))
+                        }
+                    } else {
+                        container.textView.setTextColor(Color.parseColor("#A5A5A5"))
+
+                        if (data.date.dayOfWeek == DayOfWeek.SUNDAY){
+                            container.textView.setTextColor(Color.parseColor("#F5B4B8"))
+                        }
+                        if (data.date.dayOfWeek == DayOfWeek.SATURDAY){
+                            container.textView.setTextColor(Color.parseColor("#BBC0E9"))
+                        }
+                        if (selectedMonthHolidayDates.contains(data.date.toString())){
+                            container.textView.setTextColor(Color.parseColor("#F5B4B8"))
+                        }
                     }
-                    if (data.date.dayOfWeek == DayOfWeek.SATURDAY){
-                        container.textView.setTextColor(Color.parseColor("#BBC0E9"))
-                    }
-                    if (selectedMonthHolidayDates.contains(data.date.toString())){
-                        container.textView.setTextColor(Color.parseColor("#F5B4B8"))
-                    }
+
                 }
-
                 if (data.date == today) {
                     container.textView.apply {
                         setBackgroundColor(Color.BLACK)
@@ -146,8 +188,33 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 container.view.setOnClickListener {
-                    Log.d("day", data.toString())
-                    // add color on click and make the color disappear on click other day
+                    selectedDate = data.date
+                    calendarView.notifyMonthChanged(selectedMonth)
+
+                    val todoItems = dbHelper.getToDoItemsByDay(data.date.toString())
+                    val adapter = TodoDayListAdapter(this@MainActivity, todoItems)
+
+                    val listView = findViewById<ListView>(R.id.todoDayList)
+                    // Set the adapter for the ListView
+                    listView.adapter = adapter
+                    listView.setDivider(null)
+
+                    // Get the day of the week as an integer (Sunday = 1, Monday = 2, etc.)
+                    val selectedDayOfWeek = selectedDate.dayOfWeek
+                    // Map the day of the week integer to the corresponding day name
+                    val dayOfWeekName = when (selectedDayOfWeek) {
+                        DayOfWeek.SUNDAY-> "일요일"
+                        DayOfWeek.MONDAY -> "월요일"
+                        DayOfWeek.TUESDAY -> "화요일"
+                        DayOfWeek.WEDNESDAY -> "수요일"
+                        DayOfWeek.THURSDAY -> "목요일"
+                        DayOfWeek.FRIDAY -> "금요일"
+                        DayOfWeek.SATURDAY -> "토요일"
+                        else -> "Unknown"
+                    }
+                    val todoDate = selectedDate.dayOfMonth.toString() + ". " + dayOfWeekName
+                    val todoDateText = findViewById<TextView>(R.id.todoDayText)
+                    todoDateText.text = todoDate
                 }
             }
         }
@@ -155,9 +222,6 @@ class MainActivity : AppCompatActivity() {
         calendarView.monthHeaderBinder = object : MonthHeaderFooterBinder<MonthViewContainer> {
             override fun create(view: View) = MonthViewContainer(view)
             override fun bind(container: MonthViewContainer, data: CalendarMonth) {
-                // Remember that the header is reused so this will be called for each month.
-                // However, the first day of the week will not change so no need to bind
-                // the same view every time it is reused.
                 if (container.titlesContainer.tag == null) {
                     container.titlesContainer.tag = data.yearMonth
                     container.titlesContainer.children.map { it as TextView }
@@ -188,13 +252,6 @@ class MainActivity : AppCompatActivity() {
                             }
 
                             textView.text = title
-
-                    // In the code above, we use the same `daysOfWeek` list
-                            // that was created when we set up the calendar.
-                            // However, we can also get the `daysOfWeek` list from the month data:
-                            // val daysOfWeek = data.weekDays.first().map { it.date.dayOfWeek }
-                            // Alternatively, you can get the value for this specific index:
-                            // val dayOfWeek = data.weekDays.first()[index].date.dayOfWeek
                         }
                 }
             }
@@ -203,7 +260,6 @@ class MainActivity : AppCompatActivity() {
        calendarView.monthScrollListener = object : MonthScrollListener {
            override fun invoke(p1: CalendarMonth) {
                calendarView.notifyMonthChanged(p1.yearMonth)
-//               p1.yearMonth.
                selectedMonth = p1.yearMonth
                calendarMonth.text = selectedMonth.year.toString() + "년 " + selectedMonth.monthValue.toString() + "월"
                fetchHolidays(selectedMonth.year, selectedMonth.monthValue)
@@ -224,22 +280,11 @@ class MainActivity : AppCompatActivity() {
             calendarView.notifyMonthChanged(selectedMonth.nextMonth)
             calendarView.scrollToMonth(selectedMonth.nextMonth)
             selectedMonth = selectedMonth.nextMonth
-//            val displayYearMonth = selectedMonth.toString().split('-')
             calendarMonth.text = selectedMonth.year.toString() + "년 " + selectedMonth.monthValue.toString() + "월"
             fetchHolidays(selectedMonth.year, selectedMonth.monthValue)
         }
 
-        val listView = findViewById<ListView>(R.id.todoDayList)
-//
-//        // Create a list of items
-        val items = listOf("Item 1", "Item 2", "Item 3")
-
-        // Create the custom adapter
-        val adapter = TodoDayListAdapter(this, items)
-
-        // Set the adapter for the ListView
-        listView.adapter = adapter
-        listView.setDivider(null)
+//        val listView = findViewById<ListView>(R.id.todoDayList)
 
         val addBtn = findViewById<ImageButton>(R.id.addButton)
         addBtn.setOnClickListener {
@@ -253,6 +298,7 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, AllActivity::class.java)
             startActivity(intent)
         }
+
     }
     fun dpToPx(dp: Int): Float {
         val scale = resources.displayMetrics.density

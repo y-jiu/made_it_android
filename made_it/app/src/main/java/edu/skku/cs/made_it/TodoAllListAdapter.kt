@@ -6,8 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
+import java.text.SimpleDateFormat
+import java.util.*
 
-class TodoAllListAdapter (private val context: Context, private val items: List<String>) : BaseAdapter() {
+class TodoAllListAdapter (private val context: Context, private val items: List<Todo>) : BaseAdapter() {
 
     override fun getCount(): Int {
         return items.size
@@ -26,9 +28,18 @@ class TodoAllListAdapter (private val context: Context, private val items: List<
         val todoItem = view.findViewById<TextView>(R.id.allTodo)
         val todoDday = view.findViewById<TextView>(R.id.dday)
 
-        val item = getItem(position) as String
-        todoItem.text = item
+        val currentDate = Calendar.getInstance().time
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        var date = dateFormat.format(currentDate)
 
+        val item = items[position]
+        val startDateObj = dateFormat.parse(date)
+        val endDateObj = dateFormat.parse(item.date)
+
+        val diffInMillis = endDateObj.time - startDateObj.time
+        val diffInDays = diffInMillis / (1000 * 60 * 60 * 24)
+        todoItem.text = item.title
+        todoDday.text = "D-" + diffInDays.toString()
         return view
     }
 }

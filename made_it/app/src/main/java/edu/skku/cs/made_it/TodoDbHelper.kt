@@ -58,10 +58,10 @@ class TodoDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
         )
         val schedule: Todo? = if (cursor.moveToFirst()) {
             val title = cursor.getString(cursor.getColumnIndex(COLUMN_TITLE))
-            val description = cursor.getString(cursor.getColumnIndex(COLUMN_MEMO))
+            val memo = cursor.getString(cursor.getColumnIndex(COLUMN_MEMO))
             val date = cursor.getString(cursor.getColumnIndex(COLUMN_DATE))
             val checked = cursor.getInt(cursor.getColumnIndex(COLUMN_CHECKED))
-            Todo(id, title, description, date, checked)
+            Todo(id, title, memo, date, checked)
         } else {
             null
         }
@@ -82,9 +82,9 @@ class TodoDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
         db.close()
     }
 
-    fun deleteTodo(id: String) {
+    fun deleteTodo(id: Int) {
         val db = writableDatabase
-        db.delete(TABLE_NAME, "$COLUMN_ID = ?", arrayOf(id))
+        db.delete(TABLE_NAME, "$COLUMN_ID = ?", arrayOf(id.toString()))
         db.close()
     }
 
@@ -101,4 +101,55 @@ class TodoDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
         db.close()
         return latestId
     }
+
+    fun getToDoItemsByDay(day: String): List<Todo> {
+        val db = readableDatabase
+        val cursor: Cursor = db.rawQuery("SELECT * FROM $TABLE_NAME WHERE $COLUMN_DATE = ?", arrayOf(day))
+
+        val todoItems = mutableListOf<Todo>()
+
+        if (cursor.moveToFirst()) {
+            do {
+                val id = cursor.getInt(cursor.getColumnIndex("id"))
+                val title = cursor.getString(cursor.getColumnIndex(COLUMN_TITLE))
+                val memo = cursor.getString(cursor.getColumnIndex(COLUMN_MEMO))
+                val date = cursor.getString(cursor.getColumnIndex(COLUMN_DATE))
+                val checked = cursor.getInt(cursor.getColumnIndex(COLUMN_CHECKED))
+
+                val todoItem = Todo(id, title, memo, date, checked)
+                todoItems.add(todoItem)
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        return todoItems
+    }
+
+    fun getAllToDoItems(): List<Todo> {
+        val db = readableDatabase
+        val cursor: Cursor = db.rawQuery("SELECT * FROM todo", null)
+
+        val todoItems = mutableListOf<Todo>()
+
+        if (cursor.moveToFirst()) {
+            do {
+                val id = cursor.getInt(cursor.getColumnIndex("id"))
+                val title = cursor.getString(cursor.getColumnIndex(COLUMN_TITLE))
+                val memo = cursor.getString(cursor.getColumnIndex(COLUMN_MEMO))
+                val date = cursor.getString(cursor.getColumnIndex(COLUMN_DATE))
+                val checked = cursor.getInt(cursor.getColumnIndex(COLUMN_CHECKED))
+                val todoItem = Todo(id, title, memo, date, checked)
+                todoItems.add(todoItem)
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        return todoItems
+    }
+
+
 }

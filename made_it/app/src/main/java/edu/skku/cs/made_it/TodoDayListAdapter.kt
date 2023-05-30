@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
 
-class TodoDayListAdapter(private val context: Context, private val items: List<String>) : BaseAdapter() {
+class TodoDayListAdapter(private val context: Context, private val items: List<Todo>) : BaseAdapter() {
 
     override fun getCount(): Int {
         return items.size
@@ -25,8 +25,9 @@ class TodoDayListAdapter(private val context: Context, private val items: List<S
         val view: View = LayoutInflater.from(context).inflate(R.layout.todo_item_day, parent, false)
         val todoItem = view.findViewById<TextView>(R.id.dayTodo)
 
-        val item = getItem(position) as String
-        todoItem.text = item
+        val item = items[position]
+
+        todoItem.text = item.title
 
         return view
     }
