@@ -67,23 +67,6 @@ class MainActivity : AppCompatActivity() {
         calendarView.setup(startMonth, endMonth, firstDayOfWeek)
         calendarView.scrollToMonth(currentMonth)
 
-
-//        val retrievedTodo = dbHelper.getTodoById(1)
-//        println(retrievedTodo)
-
-//        // Update a schedule
-//        val updatedTodo = retrievedTodo?.copy(title = "Updated Meeting")
-//        if (updatedTodo != null) {
-//            dbHelper.updateTodo(updatedTodo)
-//            val retrievedUpdatedSchedule = dbHelper.getTodoById(1)
-//            println(retrievedUpdatedSchedule)
-//        }
-//
-//        // Delete a schedule
-//        dbHelper.deleteTodo("1")
-//        val deletedTodo = dbHelper.getTodoById(1)
-//        println(deletedTodo)
-
         calendarMonth = findViewById(R.id.month)
 
         selectedMonth = currentMonth
@@ -100,7 +83,7 @@ class MainActivity : AppCompatActivity() {
         val adapter = TodoDayListAdapter(this, todoItems)
 
         val listView = findViewById<ListView>(R.id.todoDayList)
-        // Set the adapter for the ListView
+
         listView.adapter = adapter
         listView.setDivider(null)
 
@@ -117,6 +100,7 @@ class MainActivity : AppCompatActivity() {
             DayOfWeek.SATURDAY -> "토요일"
             else -> "Unknown"
         }
+
         val todoDate = selectedDate.dayOfMonth.toString() + ". " + dayOfWeekName
         val todoDateText = findViewById<TextView>(R.id.todoDayText)
         todoDateText.text = todoDate
@@ -231,20 +215,14 @@ class MainActivity : AppCompatActivity() {
                                 dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
                             when (title) {
                                 "Mon" -> title = "월"
-
                                 "Tue" -> title = "화"
-
                                 "Wed" -> title = "수"
-
                                 "Thu" -> title = "목"
-
                                 "Fri" -> title = "금"
-
                                 "Sat" -> {
                                     title = "토"
                                     textView.setTextColor(Color.parseColor("#7887FF"))
                                 }
-
                                 "Sun" -> {
                                     title = "일"
                                     textView.setTextColor(Color.parseColor("#FF747D"))
@@ -289,6 +267,7 @@ class MainActivity : AppCompatActivity() {
         val addBtn = findViewById<ImageButton>(R.id.addButton)
         addBtn.setOnClickListener {
             val intent = Intent(this, AddActivity::class.java)
+            intent.putExtra("ADD_NEW_TODO", true)
             startActivity(intent)
         }
 
@@ -296,6 +275,7 @@ class MainActivity : AppCompatActivity() {
         val allBtn = findViewById<ImageButton>(R.id.allButton)
         allBtn.setOnClickListener {
             val intent = Intent(this, AllActivity::class.java)
+            intent.putExtra("ADD_NEW_TODO", true)
             startActivity(intent)
         }
 

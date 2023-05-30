@@ -21,6 +21,7 @@ class AddActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add)
+        val addMode = intent.getBooleanExtra("ADD_NEW_TODO", true)
 
         val todoInput = findViewById<EditText>(R.id.todoInput)
         val dateInput = findViewById<TextView>(R.id.selectDate)
@@ -28,13 +29,29 @@ class AddActivity : AppCompatActivity() {
         val note = findViewById<EditText>(R.id.noteInput)
         val saveButton = findViewById<ImageButton>(R.id.saveButton)
         val layout = findViewById<ConstraintLayout>(R.id.addLayout)
+        val deleteButton = findViewById<ImageButton>(R.id.deleteButton)
 
-        val currentDate = Calendar.getInstance().time
+        var currentDate = Calendar.getInstance().time
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         var date = dateFormat.format(currentDate)
 
         val calendar = Calendar.getInstance()
         val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+
+        if (!addMode) {
+            val todoID = intent.getIntExtra("TODO_ID", 1)
+            val dbHelper = TodoDbHelper(this)
+            val retrievedTodo = dbHelper.getTodoById(todoID)
+            println(retrievedTodo)
+
+            if (retrievedTodo != null) {
+                todoInput.setText(retrievedTodo.title)
+                date = retrievedTodo.date
+                currentDate = dateFormat.parse(retrievedTodo.date)
+                note.setText(retrievedTodo.memo)
+            }
+            deleteButton.visibility = View.VISIBLE
+        }
 
         // Map the day of the week integer to the corresponding day name
         val dayOfWeekName = when (dayOfWeek) {
@@ -93,19 +110,41 @@ class AddActivity : AppCompatActivity() {
         }
         saveButton.setOnClickListener {
             val dbHelper = TodoDbHelper(this)
-            val latestId = dbHelper.getLatestId()
-            val newId = latestId + 1
 
-            val newTodo = Todo(
-                newId,
-                todoInput.text.toString(),
-                note.text.toString(),
-                date,
-                0
-            )
-            dbHelper.createTodo(newTodo)
-            val retrievedTodo = dbHelper.getTodoById(newId)
-            println("SAVE:" + retrievedTodo)
+            if (addMode) {
+                val latestId = dbHelper.getLatestId()
+                val newId = latestId + 1
+                val newTodo = Todo(
+                    newId,
+                    todoInput.text.toString(),
+                    note.text.toString(),
+                    date,
+                    0
+                )
+                dbHelper.createTodo(newTodo)
+                val retrievedTodo = dbHelper.getTodoById(newId)
+                println("ADD:" + retrievedTodo)
+            } else {
+                val todoID = intent.getIntExtra("TODO_ID", 1)
+                val retrievedTodo = dbHelper.getTodoById(todoID)
+
+                val updatedTodo = retrievedTodo?.copy(title = todoInput.text.toString(), memo = note.text.toString(), date = date)
+                if (updatedTodo != null) {
+                    dbHelper.updateTodo(updatedTodo)
+                    val retrievedUpdatedSchedule = dbHelper.getTodoById(todoID)
+                    println("UPDATE:" + retrievedUpdatedSchedule)
+                }
+
+            }
+
+            finish()
+        }
+
+        deleteButton.setOnClickListener {
+            // Delete a schedule
+            val todoID = intent.getIntExtra("TODO_ID", 1)
+            val dbHelper = TodoDbHelper(this)
+            dbHelper.deleteTodo(todoID)
             finish()
         }
     }
